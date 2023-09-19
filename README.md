@@ -4,3 +4,7 @@
 
 ### Cтек:
 JavaScript с использованием HTML5 Canvas
+
+### Видео-демонстрация работы:
+https://github.com/Anastas1a1/graphic_1/assets/100995952/d11c7132-4fa5-42dc-b130-765fe93c5a03
+
