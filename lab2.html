@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Кривая Безье</title>
+    <style>
+        /* body {
+            height: 100vh;
+            margin: 0;
+        } */
+        body {
+            background-color: #f9e3dc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }        
+        canvas {
+            border: 2px solid #384358;
+            border-radius: 15px;
+        }
+
+        .canvas {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header {
+            padding: 20px;
+        }
+
+        .button {
+            cursor: pointer; 
+            border-radius: 15px; 
+            padding: 10px 20px; 
+            margin: 0 10px; 
+            background-color: #b51a2b;
+            color: #fff; 
+            text-decoration: none; 
+        }
+        
+        .button:hover {
+            background-color: #442860; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a class="button" href="lab1.html">Лабораторная 1</a>
+        <a class="button" href="lab2.html">Лабораторная 2</a>
+    </div >
+    <div class="canvas">
+    <canvas id="bezierCanvas" width="600" height="600"></canvas>
+    </div>
+    <div class="canvas">
+        <button class="button" onclick="clearCanvas()">Очистить</button>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('bezierCanvas');
+        const ctx = canvas.getContext('2d');
+        const points = []; 
+        const splineResolution = 100; 
+        
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            points.push({ x, y });
+            redraw();
+        });
+        
+        function redraw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = 'blue';
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+    
+
+            if (points.length >= 4) {
+                ctx.strokeStyle = 'red';
+                ctx.beginPath();
+                for (let t = 0; t <= 1; t += 1 / splineResolution) {
+                    const { x, y } = computeBezierPoint(t);
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+        }
+        
+        function computeBezierPoint(t) {
+            const n = points.length - 1;
+            let x = 0;
+            let y = 0;
+            for (let i = 0; i <= n; i++) {
+                const binomialCoefficient = binomial(n, i);
+                const factor1 = Math.pow(1 - t, n - i);
+                const factor2 = Math.pow(t, i);
+                x += binomialCoefficient * factor1 * factor2 * points[i].x;
+                y += binomialCoefficient * factor1 * factor2 * points[i].y;
+            }
+            return { x, y };
+        }
+        
+        function binomial(n, k) {
+            if (k < 0 || k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            let result = 1;
+            for (let i = 1; i <= k; i++) {
+                result *= (n - i + 1) / i;
+            }
+            return result;
+        }
+        
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            points.length = 0; 
+        }
+    </script>
+</body>
+</html>
+

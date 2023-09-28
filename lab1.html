@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Графическое редактирование</title>
+    <style>
+        body {
+            background-color: #f9e3dc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        canvas {
+            border: 2px solid #384358;
+            border-radius: 15px;
+        }
+
+        div {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .header {
+            /* background-color: #f0f0f0; */
+            padding: 20px;
+        }
+
+        .button {
+            cursor: pointer;
+            border-radius: 15px;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #304d6c;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <a class="button" href="lab1.html">Лабораторная 1</a>
+        <a class="button" href="lab2.html">Лабораторная 2</a>
+    </div >
+    <canvas id="myCanvas" width="600" height="600"></canvas>
+    <div>
+        <label for="angleInput">Угол поворота :</label>
+        <input type="number" id="angleInput" placeholder="градусы">
+        <img id="rotateClockwise" src="assets/right.png" alt="Поворот по часовой стрелке" style="cursor: pointer;">
+        <img id="rotateCounterClockwise" src="assets/left.png" alt="Поворот против часовой стрелки"
+            style="cursor: pointer;">
+    </div>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let objectX = 100;
+        let objectY = 100;
+        let angle = 0;
+
+        let pivotX = 200;
+        let pivotY = 200;
+
+        let offsetX = 0;
+        let offsetY = 0;
+
+        let initialObjectX = objectX;
+        let initialObjectY = objectY;
+
+        let isDragging = false;
+
+        function drawObject() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(pivotX + offsetX, pivotY + offsetY);
+            ctx.rotate(angle);
+            ctx.translate(-pivotX - offsetX, -pivotY - offsetY);
+            ctx.fillRect(objectX - 50, objectY - 20, 100, 40);
+            ctx.restore();
+
+            ctx.fillStyle = '#b51a2b';
+            ctx.beginPath();
+            ctx.arc(pivotX + offsetX, pivotY + offsetY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function updatePoint(event) {
+            if (isDragging) {
+                offsetX = event.clientX - canvas.getBoundingClientRect().left - pivotX;
+                offsetY = event.clientY - canvas.getBoundingClientRect().top - pivotY;
+                drawObject();
+            }
+        }
+
+        canvas.addEventListener('mousemove', updatePoint);
+        canvas.addEventListener('mousedown', () => {
+            isDragging = true;
+        });
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        const angleInput = document.getElementById('angleInput');
+        const rotateClockwiseButton = document.getElementById('rotateClockwise');
+        const rotateCounterClockwiseButton = document.getElementById('rotateCounterClockwise');
+
+        function rotateObject(degrees) {
+            angle += (degrees * Math.PI) / 180;
+            const rotatedObjectX = (objectX - pivotX - offsetX) * Math.cos(degrees * (Math.PI / 180)) - (objectY - pivotY - offsetY) * Math.sin(degrees * (Math.PI / 180)) + pivotX + offsetX;
+            const rotatedObjectY = (objectX - pivotX - offsetX) * Math.sin(degrees * (Math.PI / 180)) + (objectY - pivotY - offsetY) * Math.cos(degrees * (Math.PI / 180)) + pivotY + offsetY;
+            objectX = rotatedObjectX;
+            objectY = rotatedObjectY;
+            drawObject();
+        }
+
+        rotateClockwiseButton.addEventListener('click', () => {
+            const inputAngle = parseFloat(angleInput.value);
+            if (!isNaN(inputAngle)) {
+                rotateObject(inputAngle);
+            }
+        });
+
+        rotateCounterClockwiseButton.addEventListener('click', () => {
+            const inputAngle = parseFloat(angleInput.value);
+            if (!isNaN(inputAngle)) {
+                rotateObject(-inputAngle);
+            }
+        });
+
+        drawObject();
+    </script>
+</body>
+
+</html>
