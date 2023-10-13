@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bezier Surface</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1500);
+        camera.position.z = 7;
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const bezierFunction = (u, v, dest) => {
+            u = u * 2 - 1;
+            v = v * 2 - 1;
+
+            const x = (1 - u) * (1 - v) * -1 + (1 - u) * v * 1 + u * (1 - v) * 1 + u * v * -1;
+            const y = (1 - u) * (1 - v) * -1 + (1 - u) * v * -1 + u * (1 - v) * 1 + u * v * 1;
+            const z = Math.sin(u * Math.PI) * Math.sin(v * Math.PI);
+
+            dest.set(x, y, z);
+        };
+
+        const geometry = new THREE.ParametricGeometry(bezierFunction, 54, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+        const surface = new THREE.Mesh(geometry, material);
+        scene.add(surface);
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            surface.rotation.x += 0.01;
+            surface.rotation.y += 0.01;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
